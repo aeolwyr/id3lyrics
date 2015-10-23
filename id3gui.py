@@ -8,6 +8,7 @@ gi.require_version('Gtk', '3.0')
 
 from gi.repository import Gtk
 from id3lyrics import ID3LyricsMonitor
+import os
 
 class MainWindow(Gtk.Window):
     def __init__(self):
@@ -42,6 +43,10 @@ class MainWindow(Gtk.Window):
 
             # include path in the header
             if path != None:
+                # do not print /home/username if we can replace it with "~"
+                home = os.path.expanduser("~")
+                if path.startswith(home):
+                    path = path.replace(home, "~", 1)
                 self.header.set_subtitle(path)
             else:
                 self.header.set_subtitle("")
