@@ -41,7 +41,7 @@ class ID3LyricsMonitor(Gio.Application):
                 object_path="/org/mpris/MediaPlayer2",
                 interface_name="org.mpris.MediaPlayer2.Player",
                 cancellable=None)
-        
+
         # return the current lyrics
         self.signal_metadata(self.proxy.get_cached_property("Metadata"))
         # when the properties changed (i.e. a new song starts)

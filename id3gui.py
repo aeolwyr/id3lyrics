@@ -17,7 +17,7 @@ class MainWindow(Gtk.Window):
         self.set_wmclass("Lyrics", "Lyrics")
         # window icon
         self.set_icon_name("audio-x-generic-symbolic")
-        
+
         # window header
         self.header = Gtk.HeaderBar(title="ID3 Lyrics GUI")
         self.header.props.show_close_button = True
@@ -28,7 +28,7 @@ class MainWindow(Gtk.Window):
         scrolled_window.set_policy(hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
                 vscrollbar_policy=Gtk.PolicyType.ALWAYS)
         scrolled_window.set_border_width(10)
-        
+
         # a label is used inside the scrolled window
         self.label = Gtk.Label()
         self.label.set_line_wrap(True)

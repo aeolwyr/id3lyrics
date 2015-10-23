@@ -38,7 +38,7 @@ def check_for_lyrics(text, path):
         # extract the lyrics using mutagen
         tags = ID3(path)
         lyrics = tags.getall("USLT")
-	
+
         return len(lyrics) > 0 and text in lyrics[0].text
     except ID3NoHeaderError:
         return False
