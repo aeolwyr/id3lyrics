@@ -37,7 +37,7 @@ class ID3LyricsMonitor(Gio.Application):
         self.proxy = Gio.DBusProxy.new_sync(connection=bus,
                 flags=Gio.DBusProxyFlags.NONE,
                 info=None,
-                name="org.mpris.MediaPlayer2.rhythmbox",
+                name="org.mpris.MediaPlayer2." + PLAYER,
                 object_path="/org/mpris/MediaPlayer2",
                 interface_name="org.mpris.MediaPlayer2.Player",
                 cancellable=None)
