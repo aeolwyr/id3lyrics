@@ -12,7 +12,7 @@ capable player. """
 PLAYER = 'rhythmbox'
 
 from gi.repository import Gio, GLib
-import urllib.parse
+import os, urllib.parse
 from mutagen.id3 import ID3, ID3NoHeaderError
 
 class ID3LyricsMonitor(Gio.Application):
@@ -90,6 +90,11 @@ class ID3LyricsMonitor(Gio.Application):
             except ID3NoHeaderError:
                 # no lyrics in the file
                 pass
+
+            # do not return /home/username if we can replace it with "~"
+            home = os.path.expanduser("~")
+            if path.startswith(home):
+                path = path.replace(home, "~", 1)
 
         self.callback_func(path, title, lyrics)
 
