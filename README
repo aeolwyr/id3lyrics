@@ -11,7 +11,8 @@ id3lyrics.py
 ============
 A monitor class that provides the lyrics of the music currently playing.
 It also includes a command-line interface to this class.
-Tested with rhythmbox, but it should work with any MPRIS capable player.
+Tested with rhythmbox and Gnome Music, but it should work with
+any MPRIS capable player.
 
 id3gui.py
 =========

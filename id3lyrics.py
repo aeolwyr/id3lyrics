@@ -6,8 +6,8 @@ and call a given callback function with the lyrics of the new song played.
 It is designed to work offline, therefore the lyrics are retrieved
 using the library mutagen, so it only works with the embedded lyrics.
 
-It is only tested with rhythmbox, but it should work with any MPRIS
-capable player. """
+It is only tested with 'rhythmbox' and 'GnomeMusic', but it should work
+with any MPRIS capable player. """
 # edit this line to find it out
 PLAYER = 'rhythmbox'
 
@@ -32,6 +32,9 @@ class ID3LyricsMonitor(Gio.Application):
 
         self.callback_func = callback_func
 
+        # url of the last played file
+        self.last_url = None
+
         # initialize the bus
         bus = Gio.bus_get_sync(bus_type=Gio.BusType.SESSION, cancellable=None)
         self.proxy = Gio.DBusProxy.new_sync(connection=bus,
@@ -42,43 +45,67 @@ class ID3LyricsMonitor(Gio.Application):
                 interface_name="org.mpris.MediaPlayer2.Player",
                 cancellable=None)
 
-        # return the current lyrics
-        self.signal_metadata(self.proxy.get_cached_property("Metadata"))
-        # when the properties changed (i.e. a new song starts)
-        # call the listener function
+        # call the callback function, even if there is no file played
+        self.process_metadata(self.proxy.get_cached_property("Metadata"), True)
+        # when the properties change (e.g. a new song
+        # starts), call the listener function
         self.proxy.connect("g-properties-changed", self.listener)
 
     def listener(self, proxy, changed_properties, invalidated_properties):
-        """ D-Bus listener, acts by calling signal_metadata when needed. """
-        status = changed_properties.lookup_value("PlaybackStatus")
-        # filter to only have the "start" or "resume" playing event
-        if status != None and status.get_string() == "Playing":
-            metadata = changed_properties.lookup_value("Metadata")
-            # in case of "resume", metadata is not present
-            # however, a "start" event is also fired, so this one can be ignored
-            if metadata != None:
-                self.signal_metadata(metadata)
+        """ D-Bus listener, acts by calling process_metadata when needed. """
+        metadata = changed_properties.lookup_value("Metadata")
+        # do not signal if the metadata is empty
+        self.process_metadata(metadata, False)
 
-    def signal_metadata(self, metadata):
-        """ Extract the MPRIS metadata and fetch the lyrics using mutagen. """
-        # default values to return
-        path = None
-        title = None
-        lyrics = "No lyrics"
+    def process_metadata(self, metadata, allow_empty):
+        """ Extract the MPRIS metadata and pass it for signalling if needed.
 
-        if metadata != None:
-            # url should be html encoded
+        Keyword arguments:
+        metadata    -- a GVariant object that holds information about the song,
+                       may be None or empty
+        allow_empty -- indicates if the signalling should be done even if
+                       the metadata object is None or empty """
+
+        # make sure the metadata is not null nor empty
+        if metadata != None and metadata.n_children() > 0:
             url = metadata.lookup_value("xesam:url").get_string()
 
+            # don't signal if we have already signalled this file
+            if url != self.last_url:
+                artist = metadata.lookup_value("xesam:artist")[0]
+                title = metadata.lookup_value("xesam:title").get_string()
+
+                self.last_url = url
+                self.signal_metadata(url, artist, title)
+
+        # in case when the script has just started, we need to signal
+        # even if there is no file
+        elif allow_empty:
+            self.signal_metadata(None)
+
+    def signal_metadata(self, url, artist=None, title=None):
+        """ Get the lyrics using mutagen and give them to the callback.
+
+        Keyword arguments:
+        url    -- location of the music file
+        artist -- name of the song's artist, not used if the url is None
+        title  -- title of the song, not used if the url is None """
+
+        # default values to return
+        path = None
+        full_title = None
+        lyrics = "No lyrics"
+
+        # if url is null, send an empty message with the default values
+        # if not, extract lyrics
+        if url != None:
             # decode path from url
             path = urllib.parse.urlparse(url).path
             path = urllib.parse.unquote(path)
 
             # extract the artist name and title
             # then create a window title from them
-            artist_str = metadata.lookup_value("xesam:artist")[0]
-            title_str = metadata.lookup_value("xesam:title").get_string()
-            title = artist_str + " - " + title_str
+            full_title = artist + " - " + title
 
             try:
                 # extract the lyrics from the file using mutagen
@@ -96,7 +123,7 @@ class ID3LyricsMonitor(Gio.Application):
             if path.startswith(home):
                 path = path.replace(home, "~", 1)
 
-        self.callback_func(path, title, lyrics)
+        self.callback_func(path, full_title, lyrics)
 
     def run(self):
         """ Start the GLib loop.
