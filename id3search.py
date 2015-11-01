@@ -11,9 +11,8 @@ The argument to the script is searched as the keyword,
 or it is asked from the user if there is no argument.
 """
 
-# edit your music folder name here
-# it is expected to be inside your home directory
-FOLDER_NAME="Music"
+# edit your music folder location here
+FOLDER_LOCATION="~/Music"
 
 import os, sys
 from mutagen.id3 import ID3, ID3NoHeaderError
@@ -45,8 +44,7 @@ def check_for_lyrics(text, path):
 
 if __name__ == "__main__":
     # xdg spec would be a better choice here
-    home = os.path.expanduser("~")
-    path = os.path.join(home, FOLDER_NAME)
+    path = os.path.expanduser(FOLDER_LOCATION)
 
     if (len(sys.argv) > 1):
         # get the string from the arguments if possible
