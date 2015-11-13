@@ -4,15 +4,14 @@
 files inside a given folder. 
 
 It is designed to work offline, therefore only the embedded
-lyrics are checked. The files must end with a ".mp3" extension.
+lyrics are checked. The files must end with a '.mp3' extension.
 
 FOLDER_NAME is used when the script is run standalone.
 The argument to the script is searched as the keyword,
-or it is asked from the user if there is no argument.
-"""
+or it is asked from the user if there is no argument. """
 
 # edit your music folder location here
-FOLDER_LOCATION="~/Music"
+FOLDER_LOCATION='~/Music'
 
 import os, sys
 from mutagen.id3 import ID3, ID3NoHeaderError
@@ -25,7 +24,7 @@ def id3_search(text, folder):
     for dirpath, dirnames, filenames in os.walk(folder):
         for f in filenames:
             # libmagic would be a much better choice
-            if f.endswith(".mp3"):
+            if f.endswith('.mp3'):
                 fullpath = os.path.join(dirpath, f)
                 if check_for_lyrics(text, fullpath):
                     print(fullpath)
@@ -36,13 +35,13 @@ def check_for_lyrics(text, path):
     try:
         # extract the lyrics using mutagen
         tags = ID3(path)
-        lyrics = tags.getall("USLT")
+        lyrics = tags.getall('USLT')
 
         return len(lyrics) > 0 and text in lyrics[0].text
     except ID3NoHeaderError:
         return False
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # xdg spec would be a better choice here
     path = os.path.expanduser(FOLDER_LOCATION)
 
@@ -51,7 +50,7 @@ if __name__ == "__main__":
         text = ' '.join(sys.argv[1:])
     else:
         # else ask it from the user
-        text = input("Enter text: ")
+        text = input('Enter text: ')
 
     try:
         id3_search(text, path)

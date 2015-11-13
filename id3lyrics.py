@@ -40,20 +40,20 @@ class ID3LyricsMonitor(Gio.Application):
         self.proxy = Gio.DBusProxy.new_sync(connection=bus,
                 flags=Gio.DBusProxyFlags.NONE,
                 info=None,
-                name="org.mpris.MediaPlayer2." + PLAYER,
-                object_path="/org/mpris/MediaPlayer2",
-                interface_name="org.mpris.MediaPlayer2.Player",
+                name='org.mpris.MediaPlayer2.' + PLAYER,
+                object_path='/org/mpris/MediaPlayer2',
+                interface_name='org.mpris.MediaPlayer2.Player',
                 cancellable=None)
 
         # call the callback function, even if there is no file played
-        self.process_metadata(self.proxy.get_cached_property("Metadata"), True)
+        self.process_metadata(self.proxy.get_cached_property('Metadata'), True)
         # when the properties change (e.g. a new song
         # starts), call the listener function
-        self.proxy.connect("g-properties-changed", self.listener)
+        self.proxy.connect('g-properties-changed', self.listener)
 
     def listener(self, proxy, changed_properties, invalidated_properties):
         """ D-Bus listener, acts by calling process_metadata when needed. """
-        metadata = changed_properties.lookup_value("Metadata")
+        metadata = changed_properties.lookup_value('Metadata')
         # do not signal if the metadata is empty
         self.process_metadata(metadata, False)
 
@@ -68,12 +68,12 @@ class ID3LyricsMonitor(Gio.Application):
 
         # make sure the metadata is not null nor empty
         if metadata != None and metadata.n_children() > 0:
-            url = metadata.lookup_value("xesam:url").get_string()
+            url = metadata.lookup_value('xesam:url').get_string()
 
             # don't signal if we have already signalled this file
             if url != self.last_url:
-                artist = metadata.lookup_value("xesam:artist")[0]
-                title = metadata.lookup_value("xesam:title").get_string()
+                artist = metadata.lookup_value('xesam:artist')[0]
+                title = metadata.lookup_value('xesam:title').get_string()
 
                 self.last_url = url
                 self.signal_metadata(url, artist, title)
@@ -94,7 +94,7 @@ class ID3LyricsMonitor(Gio.Application):
         # default values to return
         path = None
         full_title = None
-        lyrics = "No lyrics"
+        lyrics = 'No lyrics'
 
         # if url is null, send an empty message with the default values
         # if not, extract lyrics
@@ -105,12 +105,12 @@ class ID3LyricsMonitor(Gio.Application):
 
             # extract the artist name and title
             # then create a window title from them
-            full_title = artist + " - " + title
+            full_title = artist + ' - ' + title
 
             try:
                 # extract the lyrics from the file using mutagen
                 tags = ID3(path)
-                lyrics_tag = tags.getall("USLT")
+                lyrics_tag = tags.getall('USLT')
 
                 if len(lyrics_tag) > 0:
                     lyrics = lyrics_tag[0].text
@@ -118,10 +118,10 @@ class ID3LyricsMonitor(Gio.Application):
                 # no lyrics in the file
                 pass
 
-            # do not return /home/username if we can replace it with "~"
-            home = os.path.expanduser("~")
+            # do not return /home/username if we can replace it with '~'
+            home = os.path.expanduser('~')
             if path.startswith(home):
-                path = path.replace(home, "~", 1)
+                path = path.replace(home, '~', 1)
 
         self.callback_func(path, full_title, lyrics)
 
@@ -136,7 +136,7 @@ if __name__ == '__main__':
         """ A simple callback function example that prints the lyrics to the
         standard output, along with the path as a title. """
         # clear the screen
-        print(chr(27) + "[2J", chr(27) + "[;H")
+        print(chr(27) + '[2J', chr(27) + '[;H')
 
         if path != None:
             print(path)

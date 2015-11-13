@@ -14,12 +14,12 @@ class MainWindow(Gtk.Window):
         Gtk.Window.__init__(self)
 
         # window title (to be shown in the DE)
-        self.set_wmclass("Lyrics", "Lyrics")
+        self.set_wmclass('Lyrics', 'Lyrics')
         # window icon
-        self.set_icon_name("audio-x-generic-symbolic")
+        self.set_icon_name('audio-x-generic-symbolic')
 
         # window header
-        self.header = Gtk.HeaderBar(title="ID3 Lyrics GUI")
+        self.header = Gtk.HeaderBar(title='ID3 Lyrics GUI')
         self.header.props.show_close_button = True
         self.set_titlebar(self.header)
 
@@ -44,19 +44,19 @@ class MainWindow(Gtk.Window):
             if path != None:
                 self.header.set_subtitle(path)
             else:
-                self.header.set_subtitle("")
+                self.header.set_subtitle('')
 
             # include title in the header
             if title != None:
                 self.header.set_title(title)
             else:
-                self.header.set_title("ID3 Lyrics GUI")
+                self.header.set_title('ID3 Lyrics GUI')
 
         # finally we can create a monitor object
         ID3LyricsMonitor(callback_func)
 
 window = MainWindow()
-window.connect("delete-event", Gtk.main_quit)
+window.connect('delete-event', Gtk.main_quit)
 window.show_all()
 
 # this line also runs the monitor, as it uses GLib internally
