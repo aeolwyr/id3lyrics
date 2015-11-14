@@ -7,7 +7,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 
 from gi.repository import Gtk
-from id3lyrics import ID3LyricsMonitor
+import id3lyrics
 
 class MainWindow(Gtk.Window):
     def __init__(self):
@@ -53,7 +53,7 @@ class MainWindow(Gtk.Window):
                 self.header.set_title('ID3 Lyrics GUI')
 
         # finally we can create a monitor object
-        ID3LyricsMonitor(callback_func)
+        id3lyrics.ID3LyricsMonitor(callback_func)
 
 window = MainWindow()
 window.connect('delete-event', Gtk.main_quit)

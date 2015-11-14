@@ -14,7 +14,7 @@ or it is asked from the user if there is no argument. """
 FOLDER_LOCATION='~/Music'
 
 import os, sys
-from mutagen.id3 import ID3, ID3NoHeaderError
+import mutagen.id3
 
 def id3_search(text, folder):
     """ Search for a substring in the all music files in the given folder,
@@ -34,11 +34,11 @@ def check_for_lyrics(text, path):
     located in the given path. """
     try:
         # extract the lyrics using mutagen
-        tags = ID3(path)
+        tags = mutagen.id3.ID3(path)
         lyrics = tags.getall('USLT')
 
         return len(lyrics) > 0 and text in lyrics[0].text
-    except ID3NoHeaderError:
+    except mutagen.id3.ID3NoHeaderError:
         return False
 
 if __name__ == '__main__':

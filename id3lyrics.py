@@ -13,7 +13,7 @@ PLAYER = 'rhythmbox'
 
 from gi.repository import Gio, GLib
 import os, urllib.parse
-from mutagen.id3 import ID3, ID3NoHeaderError
+import mutagen.id3
 
 class ID3LyricsMonitor(Gio.Application):
     """ Fetch the current lyrics and call the given function """
@@ -109,12 +109,12 @@ class ID3LyricsMonitor(Gio.Application):
 
             try:
                 # extract the lyrics from the file using mutagen
-                tags = ID3(path)
+                tags = mutagen.id3.ID3(path)
                 lyrics_tag = tags.getall('USLT')
 
                 if len(lyrics_tag) > 0:
                     lyrics = lyrics_tag[0].text
-            except ID3NoHeaderError:
+            except mutagen.id3.ID3NoHeaderError:
                 # no lyrics in the file
                 pass
 
