@@ -12,7 +12,7 @@ with any MPRIS capable player. """
 PLAYER = 'rhythmbox'
 
 from gi.repository import Gio, GLib
-import os, urllib.parse
+import urllib.parse
 import mutagen.id3
 
 class ID3LyricsMonitor(Gio.Application):
@@ -119,7 +119,7 @@ class ID3LyricsMonitor(Gio.Application):
                 pass
 
             # do not return /home/username if we can replace it with '~'
-            home = os.path.expanduser('~')
+            home = GLib.get_home_dir()
             if path.startswith(home):
                 path = path.replace(home, '~', 1)
 
