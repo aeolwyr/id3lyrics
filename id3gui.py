@@ -30,7 +30,7 @@ class MainWindow(Gtk.Window):
         scrolled_window.set_border_width(10)
 
         # a label is used inside the scrolled window
-        self.label = Gtk.Label()
+        self.label = Gtk.Label('Waiting for a player...')
         self.label.set_line_wrap(True)
 
         scrolled_window.add_with_viewport(self.label)

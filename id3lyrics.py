@@ -7,9 +7,15 @@ It is designed to work offline, therefore the lyrics are retrieved
 using the library mutagen, so it only works with the embedded lyrics.
 
 It is only tested with 'rhythmbox' and 'GnomeMusic', but it should work
-with any MPRIS capable player. """
-# edit this line to find it out
-PLAYER = 'rhythmbox'
+with any MPRIS capable player.
+
+The player is automatically detected when the class initializes,
+and it is not refreshed if you change to another player, you need to
+create a new class if you need reinitialization.
+
+In case of multiple players running at the same time, one of them
+is chosen randomly, therefore make sure only the one you want to be
+connected is running when creating this class. """
 
 from gi.repository import Gio, GLib
 import urllib.parse
@@ -27,8 +33,8 @@ class ID3LyricsMonitor(Gio.Application):
                          lyrics)
 
         This function also initializes the bus.
-        Note that the callback function is immediately called with the
-        current lyrics. """
+        Note that the callback function is immediately called when the
+        connection to the player is established. """
 
         self.callback_func = callback_func
 
@@ -37,10 +43,54 @@ class ID3LyricsMonitor(Gio.Application):
 
         # initialize the bus
         bus = Gio.bus_get_sync(bus_type=Gio.BusType.SESSION, cancellable=None)
+
+        self.detect_and_connect_to_player(bus)
+
+    def detect_and_connect_to_player(self, bus):
+        """ Find the first available MPRIS capable player and connect to it. """
+        proxy = Gio.DBusProxy.new_sync(connection=bus,
+                flags=Gio.DBusProxyFlags.NONE,
+                info=None,
+                name='org.freedesktop.DBus',
+                object_path='/org/freedesktop/DBus',
+                interface_name='org.freedesktop.DBus',
+                cancellable=None)
+
+        def find_player():
+            """ Go through all the DBus names and connect if a music player
+            is found. This function will be repeatedly called until
+            this happens.
+            Returns True if a player is not found, and False
+            if a player is found and connected. """
+            # the return value may seem backwards, but this is a requirement
+            # of the GLib timeout function:
+            # True means 'loop again'
+            # False means 'end loop'
+            names = proxy.call_sync(method_name='ListNames',
+                    parameters=None,
+                    flags=Gio.DBusCallFlags.NONE,
+                    timeout_msec=-1,
+                    cancellable=None)
+            for name in names[0]:
+                if name.startswith('org.mpris.MediaPlayer2.'):
+                    self.start_connection(bus, name)
+                    return False
+            else:
+                return True
+
+        # do the initial check instantly
+        if find_player():
+            # continue checking until a player is found
+            GLib.timeout_add_seconds(2, find_player)
+
+    def start_connection(self, bus, player_name):
+        """ Connect to a player.
+        Calls the callback function once, and then sets up so that it
+        is called whenever the song changes. """
         self.proxy = Gio.DBusProxy.new_sync(connection=bus,
                 flags=Gio.DBusProxyFlags.NONE,
                 info=None,
-                name='org.mpris.MediaPlayer2.' + PLAYER,
+                name=player_name,
                 object_path='/org/mpris/MediaPlayer2',
                 interface_name='org.mpris.MediaPlayer2.Player',
                 cancellable=None)
@@ -143,6 +193,7 @@ if __name__ == '__main__':
         print(lyrics)
 
     try:
+        print('Connecting to the first available player...')
         # simply create a monitor object, give it your callback function
         monitor = ID3LyricsMonitor(print_func)
         # and run it
