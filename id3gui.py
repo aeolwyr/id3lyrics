@@ -13,6 +13,8 @@ class MainWindow(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self)
 
+        # initial size
+        self.set_default_size(350, 600)
         # window title (to be shown in the DE)
         self.set_wmclass('Lyrics', 'Lyrics')
         # window icon
