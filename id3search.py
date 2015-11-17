@@ -18,7 +18,8 @@ import mutagen.id3
 
 def id3_search(text, folder):
     """ Search for a substring in the all music files in the given folder,
-    including subdirectories, and print the paths of the matching ones. """
+    including subdirectories, and iterates through the paths of the
+    matching ones. """
 
     # perform a linear search
     for dirpath, dirnames, filenames in os.walk(folder):
@@ -27,7 +28,7 @@ def id3_search(text, folder):
             if f.endswith('.mp3'):
                 fullpath = os.path.join(dirpath, f)
                 if check_for_lyrics(text, fullpath):
-                    print(fullpath)
+                    yield fullpath
 
 def check_for_lyrics(text, path):
     """ Check if a given text is a substring of the lyrics of the music file
@@ -53,6 +54,7 @@ if __name__ == '__main__':
         text = input('Enter text: ')
 
     try:
-        id3_search(text, path)
+        for fullpath in id3_search(text, path):
+            print(fullpath)
     except KeyboardInterrupt:
         pass
