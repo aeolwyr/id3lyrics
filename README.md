@@ -21,7 +21,7 @@ It should work with any MPRIS capable player. Tested with:
 
 id3gui.py
 ---------
-A GTK frontend for id3lyrics.py.
+A GTK frontend for id3lyrics.py.  
 ![gui screenshot](https://cloud.githubusercontent.com/assets/8158408/11224415/89906e1c-8d7d-11e5-9545-ff47cfc27561.png)
 
 id3search.py
