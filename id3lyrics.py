@@ -178,10 +178,12 @@ class ID3LyricsMonitor(Gio.Application):
     def get_url_from_metadata(self, metadata):
         """ Extract the URL from a metadata object. Returns None if the URL is
         invalid or the metadata does not contain an URL. """
-        if metadata != None and metadata.n_children() > 0:
-            url = metadata.lookup_value('xesam:url').get_string()
-            if url != '':
-                return url
+        if metadata != None:
+            url_object = metadata.lookup_value('xesam:url')
+            if url_object != None:
+                url = url_object.get_string()
+                if url != '':
+                    return url
         return None
 
     def run(self):
