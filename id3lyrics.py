@@ -6,8 +6,7 @@ and call a given callback function with the lyrics of the new song played.
 It is designed to work offline, therefore the lyrics are retrieved
 using the library mutagen, so it only works with the embedded lyrics.
 
-It is only tested with 'rhythmbox' and 'GnomeMusic', but it should work
-with any MPRIS capable player.
+It should work with any MPRIS capable player.
 
 The player is automatically detected when the class initializes,
 and it is not refreshed if you change to another player, you need to
