@@ -117,9 +117,8 @@ class ID3LyricsMonitor(Gio.Application):
                        the metadata object is None or empty """
 
         # make sure the metadata is not null nor empty
-        if metadata != None and metadata.n_children() > 0:
-            url = metadata.lookup_value('xesam:url').get_string()
-
+        url = self.get_url_from_metadata(metadata)
+        if url != None:
             # don't signal if we have already signalled this file
             if url != self.last_url:
                 artist = metadata.lookup_value('xesam:artist')[0]
@@ -147,6 +146,7 @@ class ID3LyricsMonitor(Gio.Application):
         lyrics = 'No lyrics'
 
         # if url is null, send an empty message with the default values
+        # (happens when the player has just started and is not playing)
         # if not, extract lyrics
         if url != None:
             # decode path from url
@@ -174,6 +174,15 @@ class ID3LyricsMonitor(Gio.Application):
                 path = path.replace(home, '~', 1)
 
         self.callback_func(path, full_title, lyrics)
+
+    def get_url_from_metadata(self, metadata):
+        """ Extract the URL from a metadata object. Returns None if the URL is
+        invalid or the metadata does not contain an URL. """
+        if metadata != None and metadata.n_children() > 0:
+            url = metadata.lookup_value('xesam:url').get_string()
+            if url != '':
+                return url
+        return None
 
     def run(self):
         """ Start the GLib loop.
