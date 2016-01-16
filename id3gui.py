@@ -26,21 +26,27 @@ class MainWindow(Gtk.Window):
         self.set_titlebar(self.header)
 
         # we only need one scrolled window (for lyrics)
-        scrolled_window = Gtk.ScrolledWindow()
-        scrolled_window.set_policy(hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
+        self.scrolled_window = Gtk.ScrolledWindow()
+        self.scrolled_window.set_policy(
+                hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
                 vscrollbar_policy=Gtk.PolicyType.ALWAYS)
-        scrolled_window.set_border_width(10)
+        self.scrolled_window.set_border_width(10)
 
         # a label is used inside the scrolled window
         self.label = Gtk.Label('Waiting for a player...')
         self.label.set_line_wrap(True)
 
-        scrolled_window.add_with_viewport(self.label)
-        self.add(scrolled_window)
+        self.scrolled_window.add_with_viewport(self.label)
+        self.add(self.scrolled_window)
 
         def callback_func(path, title, lyrics):
             # set the label text inside the scrolled window as the lyrics
             self.label.set_text(lyrics)
+
+            # move the scrolled window to the top
+            vadjustment = self.scrolled_window.get_vadjustment()
+            vadjustment.set_value(vadjustment.get_lower())
+            self.scrolled_window.set_vadjustment(vadjustment)
 
             # include path in the header
             if path != None:
