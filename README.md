@@ -14,6 +14,7 @@ It should work with any MPRIS capable player. Tested with:
 * clementine
 * gnome-music
 * gogglesmm
+* lollypop
 * pragha
 * qmmp
 * quodlibet
